@@ -149,7 +149,7 @@ decode(All, Options) when is_binary(All), is_list(Options) ->
     decode(Headers, Body, Options).
 
 decode(OrigHeaders, Body, Options) ->
-    ?LOG_DEBUG("headers: ~p", [OrigHeaders], ?LOGGER_META),
+    % ?LOG_DEBUG("headers: ~p", [OrigHeaders], ?LOGGER_META),
     Encoding = proplists:get_value(encoding, Options, none),
     %FixedHeaders = fix_headers(Headers),
     Headers = decode_headers(OrigHeaders, [], Encoding),
@@ -219,7 +219,7 @@ encode({Type, Subtype, Headers, ContentTypeParams, Parts}, Options) ->
         EncodedBody
     ]);
 encode(_, _) ->
-    ?LOG_DEBUG("Not a mime-decoded DATA", ?LOGGER_META),
+    % ?LOG_DEBUG("Not a mime-decoded DATA", ?LOGGER_META),
     erlang:error(non_mime).
 
 decode_headers(Headers, _, none) ->
@@ -375,7 +375,7 @@ decode_component(Headers, Body, MimeVsn = <<"1.0", _/binary>>, Options) ->
             },
             {<<"message">>, <<"rfc822">>, Headers, Parameters2, decode(NewHeaders, NewBody, Options)};
         {Type, SubType, Parameters} ->
-            ?LOG_DEBUG("body is ~s/~s", [Type, SubType], ?LOGGER_META),
+            % ?LOG_DEBUG("body is ~s/~s", [Type, SubType], ?LOGGER_META),
             Parameters2 = #{
                 content_type_params => Parameters,
                 disposition => Disposition,
@@ -406,7 +406,7 @@ decode_component(_Headers, _Body, Other, _Options) ->
 -spec get_header_value(Needle :: binary(), Headers :: [{binary(), binary()}], Default :: any()) -> binary() | any().
 %% @doc Do a case-insensitive header lookup to return that header's value, or the specified default.
 get_header_value(Needle, Headers, Default) ->
-    ?LOG_DEBUG("Headers: ~p", [Headers], ?LOGGER_META),
+    % ?LOG_DEBUG("Headers: ~p", [Headers], ?LOGGER_META),
     NeedleLower = binstr:to_lower(Needle),
     F =
         fun({Header, _Value}) ->
@@ -562,7 +562,7 @@ parse_headers(Body, <<H, T/binary>>, Headers) when H =:= $\s; H =:= $\t ->
     % folded headers
     [{FieldName, OldFieldValue} | OtherHeaders] = Headers,
     FieldValue = list_to_binary([OldFieldValue, T]),
-    ?LOG_DEBUG("~p = ~p", [FieldName, FieldValue], ?LOGGER_META),
+    % ?LOG_DEBUG("~p = ~p", [FieldName, FieldValue], ?LOGGER_META),
     case binstr:strpos(Body, "\r\n") of
         0 ->
             {lists:reverse([{FieldName, FieldValue} | OtherHeaders]), Body};
@@ -574,7 +574,7 @@ parse_headers(Body, <<H, T/binary>>, Headers) when H =:= $\s; H =:= $\t ->
             ])
     end;
 parse_headers(Body, Line, Headers) ->
-    ?LOG_DEBUG("line: ~p", [Line], ?LOGGER_META),
+    % ?LOG_DEBUG("line: ~p", [Line], ?LOGGER_META),
     case binstr:strchr(Line, $:) of
         0 ->
             {lists:reverse(Headers), list_to_binary([Line, "\r\n", Body])};
